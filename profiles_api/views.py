@@ -1,6 +1,6 @@
 
 from django.shortcuts import render
-from rest_framework import status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -125,3 +125,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     #4. add permissions classes that will set how user gets permission to do certain things.
     permission_classes = (permissions.UpdateOwnProfile,)
 
+    # add search filters
+    filter_backends = (filters.SearchFilter,)
+    # which field to search on
+    search_fields = ('name', 'email',)
