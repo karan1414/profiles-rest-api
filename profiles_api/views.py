@@ -1,10 +1,11 @@
 
 from django.shortcuts import render
 from rest_framework import status, viewsets
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from profiles_api import serializers
+from profiles_api import models, permissions, serializers
 
 # we will use this to tell our apiview what data to expect when making post put and patch request to our api
 
@@ -109,3 +110,18 @@ class HelloViewSet(viewsets.ViewSet):
         """Handle removing an object"""
 
         return Response({'http_method': 'DELETE'})
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """ Handle creating and updating profiles """
+
+    # 1. connect model view set to a serializer class.
+    serializer_class = serializers.UserProfileSerializer
+    # 2. provide a query set to the model view set so that it know which object in db are going to be managed through this viewset
+    queryset = models.UserProfile.objects.all()
+
+    # 3. add authentication classes (create permission beofre this step). We can configur 1 or more types of authentication. This sets how user will be authenticated.
+    authentication_classes = (TokenAuthentication,)
+    #4. add permissions classes that will set how user gets permission to do certain things.
+    permission_classes = (permissions.UpdateOwnProfile,)
+
