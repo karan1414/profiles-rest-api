@@ -1,7 +1,8 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from profiles_api.views import HelloApiView, HelloViewSet, UserProfileViewSet
+from profiles_api.views import (HelloApiView, HelloViewSet, UserLoginApiView,
+                                UserProfileViewSet)
 
 router = DefaultRouter()
 # this will create the full url for us so we do not need to specify /
@@ -12,6 +13,7 @@ router.register('profile', UserProfileViewSet)
 
 urlpatterns = [
     path('hello/', HelloApiView.as_view()),
+    path('login/', UserLoginApiView.as_view()),
     # as we register new routes with router it generates list of all urls for our viewset
     path('', include(router.urls))
 ]
