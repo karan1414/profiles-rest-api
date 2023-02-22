@@ -2,6 +2,8 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
 
+from profiles_project import settings
+
 
 # we create managers when we want to implement some costum functionalities in Django inbuilt code.
 # The way managers work is we speficy some functions within the manager that can be used to manipulate objects within the model the manager is for
@@ -37,6 +39,7 @@ class UserProfileManager(BaseUserManager):
         return user
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
+
     ''' Database model for users in system '''
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
@@ -60,3 +63,18 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         """ Return string representation of user  """
         return self.email
+
+class ProfileFeedItem(models.Model):
+    """ Profile status updates """
+    user_profile = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    status_text = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """ Return model as string """
+        return self.status_text
+
+

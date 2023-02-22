@@ -3,6 +3,8 @@ from django.shortcuts import render
 from rest_framework import filters, status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
@@ -136,3 +138,22 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 class UserLoginApiView(ObtainAuthToken):
     """ Handle creating user authentication tokens"""
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
+class UserProfileFeedViewSet(viewsets.ModelViewSet):
+    """ Handles crud profile feed items """
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.ProfileFeedItemSerializer
+    queryset = models.ProfileFeedItem.objects.all()
+    permission_classes = (
+        permissions.updateOwnStatus, 
+        IsAuthenticated #makes sure that a user must to authenticated ot perform any request that is not read req.
+    )
+    # this is a drf functionality that helps us to override/ customise behaviour of creating objects through a model view set
+    # When a request is made to the viewset it is passed into serializer class and validated, then serializer.save() is called by default. I we want to customise logic for creating a obj we can do it using perform_create function. This is called everytime we do a post request. 
+    def perform_create(self, serializer):
+        """ Sets the user profile to logged in user """
+        # if the user is has an valid token authentication all user details would be in request.user
+        # When a new obj is created drf calls perform_create and it passes in serializer that we use to create obj. This is a model serializer so it has a save function assigned to it.
+        # This save function is used to save the contents of the serializer to an obj in the db.
+        serializer.save(user_profile=self.request.user)
